@@ -8,8 +8,21 @@ void Push(char Stack[], int *top, char data) {       // 스택에 연산자가 차곡 차�
 	Stack[(*top)++] = data;
 }
 
+void CPush(int Stack[], int *top, int data) {
+	if (*top == STACKSIZE) {
+		puts("더 이상 연산자를 출력할 수 없습니다.");
+		return;
+	}
+	Stack[(*top)++] = data;
+}
+
 char Pop(char Stack[], int *top) {                    // 탑에서 연산자를 하나씩 빼오는 과정
 	if (*top == 0) return ERROR_VALUE;                // 연산자가 더 이상 없다면(탑이 비었다면)
+	return Stack[--*top];
+}
+
+int CPop(int Stack[], int *top) {
+	if (*top == 0) return 0;
 	return Stack[--*top];
 }
 
@@ -39,6 +52,34 @@ void Blanket(char* Data, char* Blanket_Data_OUTPUT, int* i) {
 		}
 		else if (Data[*i] == '(') {
 			Blanket(Data, Blanket_Data, i);
+			for (int j = 0; Blanket_Data[j]; j++) Blanket_Data_OUTPUT[count++] = Blanket_Data[j];
+		}
+		else Blanket_Data_OUTPUT[count++] = Data[*i];
+	}
+	for (; top > 0;)
+		Blanket_Data_OUTPUT[count++] = Pop(Stack, &top);
+}
+
+void CBlanket(char* Data, char* Blanket_Data_OUTPUT, int* i, int* Var, int* Var_count, int* Var_Number) {
+	char Stack[STACKSIZE] = { 0 };
+	char Blanket_Data[16] = { 0 };
+	int top = 0;
+	int count = 0;
+	for ((*i)++; Data[*i] != ')'; (*i)++) {
+		Var_Number[*Var_count]++;
+		if (Data[*i] == '+' || Data[*i] == '-'
+			|| Data[*i] == '*' || Data[*i] == '/') {
+			if (Stack[top - 1] && top != 0)
+				for (int j = top - 1; Priority(Stack[j]) >= Priority(Data[*i]); j--)
+					Blanket_Data_OUTPUT[count++] = Pop(Stack, &top);
+			Push(Stack, &top, Data[*i]);
+			Var_Number[*Var_count]--;
+			Var[(*Var_count)++] = Var_Produce(Data, Var_count, Var_Number);
+			Var_Number[(*Var_count) - 1]++;
+			Var_Number[*Var_count] = Var_Number[(*Var_count) - 1];                                 // 연산자 제외
+		}
+		else if (Data[*i] == '(') {
+			CBlanket(Data, Blanket_Data, i, Var, Var_count, Var_Number);
 			for (int j = 0; Blanket_Data[j]; j++) Blanket_Data_OUTPUT[count++] = Blanket_Data[j];
 		}
 		else Blanket_Data_OUTPUT[count++] = Data[*i];
