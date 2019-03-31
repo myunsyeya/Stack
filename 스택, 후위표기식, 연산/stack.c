@@ -29,6 +29,7 @@ int Priority(char data) {                             // 우선순위를 비교해주는 �
 
 void Blanket(char* Data, char* Blanket_Data_OUTPUT, int* i) {
 	char Stack[STACKSIZE] = { 0 };
+	char Blanket_Data[16] = { 0 };
 	int top = 0;
 	int count = 0;
 	for ((*i)++; Data[*i] != ')'; (*i)++) {
@@ -38,6 +39,10 @@ void Blanket(char* Data, char* Blanket_Data_OUTPUT, int* i) {
 				for (int j = top - 1; Priority(Stack[j]) >= Priority(Data[*i]); j--)
 					Blanket_Data_OUTPUT[count++] = Pop(Stack, &top);
 			Push(Stack, &top, Data[*i]);
+		}
+		else if (Data[*i] == '(') {
+			Blanket(Data, Blanket_Data, i);
+			for (int j = 0; Blanket_Data[j]; j++) Blanket_Data_OUTPUT[count++] = Blanket_Data[j];
 		}
 		else Blanket_Data_OUTPUT[count++] = Data[*i];
 	}
