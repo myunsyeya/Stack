@@ -60,7 +60,7 @@ void Blanket(char* Data, char* Blanket_Data_OUTPUT, int* i) {
 		Blanket_Data_OUTPUT[count++] = Pop(Stack, &top);
 }
 
-void CBlanket(char* Data, char* Blanket_Data_OUTPUT, int* i, int* Var, int* Var_count, int* Var_Number) {
+void CBlanket(char* Data, char* Blanket_Data_OUTPUT, int* i, int* Var, int* Var_count, int* Var_Number, int Blanket) {
 	char Stack[STACKSIZE] = { 0 };
 	char Blanket_Data[16] = { 0 };
 	int top = 0;
@@ -74,12 +74,15 @@ void CBlanket(char* Data, char* Blanket_Data_OUTPUT, int* i, int* Var, int* Var_
 					Blanket_Data_OUTPUT[count++] = Pop(Stack, &top);
 			Push(Stack, &top, Data[*i]);
 			Var_Number[*Var_count]--;
-			Var[(*Var_count)++] = Var_Produce(Data, Var_count, Var_Number);
+			Var[(*Var_count)++] = Var_Produce(Data, Var_count, Var_Number, Blanket);
 			Var_Number[(*Var_count) - 1]++;
 			Var_Number[*Var_count] = Var_Number[(*Var_count) - 1];                                 // 연산자 제외
 		}
 		else if (Data[*i] == '(') {
-			CBlanket(Data, Blanket_Data, i, Var, Var_count, Var_Number);
+			if (Var_count == 0);
+			else Var_Number[*Var_count - 1]++;                                                     // ( 제외
+			CBlanket(Data, Blanket_Data, i, Var, Var_count, Var_Number, Blanket);
+			Var_Number[*Var_count]++;                                                              // ) 제외
 			for (int j = 0; Blanket_Data[j]; j++) Blanket_Data_OUTPUT[count++] = Blanket_Data[j];
 		}
 		else Blanket_Data_OUTPUT[count++] = Data[*i];

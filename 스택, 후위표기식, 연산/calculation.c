@@ -16,10 +16,11 @@ int Divide(int Pop1, int Pop2) {
 	return Pop1 / Pop2;
 }
 
-int Var_Produce(char* Data, int* Var_count, int* Var_Number) {
+int Var_Produce(char* Data, int* Var_count, int* Var_Number, int Blanket) {
 	char Dummy[8] = { 0 };
 	int i = 0;
-	if (*Var_count == 0) for (int j = 0; j < Var_Number[*Var_count]; j++) Dummy[j] = Data[j];
+	if (Blanket == 1 && *Var_count == 0) for (int j = 1; j < Var_Number[*Var_count]; j++) Dummy[i++] = Data[j];
+	else if (*Var_count == 0) for (int j = 0; j < Var_Number[*Var_count]; j++) Dummy[i++] = Data[j];
 	else for (int j = Var_Number[*Var_count - 1]; j < Var_Number[*Var_count]; j++) Dummy[i++] = Data[j];
 	return atoi(Dummy);
 }
@@ -33,6 +34,7 @@ void Calculation() {
 	int count = 0;
 	int Var_count = 0;
 	int CData_OUTPUT = 0;
+	int Blanket = 0;
 	int CStack[STACKSIZE] = { 0 };
 	int Var[16] = { 0 };
 	int Var_Number[16] = { 0 };
@@ -48,17 +50,20 @@ void Calculation() {
 				for (int j = top - 1; Priority(Stack[j]) >= Priority(Data[i]); j--) Data_OUTPUT[count++] = Pop(Stack, &top);
 			Push(Stack, &top, Data[i]);
 			Var_Number[Var_count]--;
-			Var[Var_count++] = Var_Produce(Data, &Var_count, Var_Number);
+			Var[Var_count++] = Var_Produce(Data, &Var_count, Var_Number, Blanket);
 			Var_Number[Var_count - 1]++;
 			Var_Number[Var_count] = Var_Number[Var_count - 1];                                      // 연산자 제외
 		}
 		else if (Data[i] == '(') {
-			CBlanket(Data, Blanket_OUTPUT, &i, Var, &Var_count, Var_Number);
+			if (Var_count == 0) Blanket = 1;
+			else Var_Number[Var_count - 1]++;                                                       // ( 제외
+			CBlanket(Data, Blanket_OUTPUT, &i, Var, &Var_count, Var_Number, Blanket);
+			Var_Number[Var_count]++;                                                                // ) 제외
 			for (int j = 0; Blanket_OUTPUT[j]; j++) Data_OUTPUT[count++] = Blanket_OUTPUT[j];
 		}
 		else Data_OUTPUT[count++] = Data[i];
 	}
-	Var[Var_count] = Var_Produce(Data, &Var_count, Var_Number);
+	Var[Var_count] = Var_Produce(Data, &Var_count, Var_Number, Blanket);
 	for (; top > 0;)
 		Data_OUTPUT[count++] = Pop(Stack, &top);
 	count = 0;
